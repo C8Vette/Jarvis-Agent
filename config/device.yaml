@@ -1,0 +1,23 @@
+device_name: "Ethan Desktop"
+
+allowed_folders:
+  - "C:/Users/tsmgr/Desktop"
+  - "C:/Users/tsmgr/Documents"
+  - "C:/Users/tsmgr/Downloads"
+
+apps:
+  chrome: "C:/Program Files/Google/Chrome/Application/chrome.exe"
+  edge: "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+  opera: "C:/Users/tsmgr/AppData/Local/Programs/Opera/opera.exe"
+  vscode: "code"
+  powershell: "powershell"
+
+websites:
+  email: "https://mail.google.com"
+  gmail: "https://mail.google.com"
+  outlook: "https://outlook.office.com"
+  github: "https://github.com"
+  aws: "https://console.aws.amazon.com"
+  indeed: "https://www.indeed.com"
+  linkedin: "https://www.linkedin.com/jobs"
+  handshake: "https://joinhandshake.com"

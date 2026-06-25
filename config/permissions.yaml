@@ -1,0 +1,14 @@
+auto_allow:
+  - open_app
+  - open_website
+  - search_files
+  - open_folder
+
+require_confirmation:
+  - run_terminal
+  - move_file
+  - copy_file
+  - delete_file
+  - send_email
+  - install_package
+  - change_system_settings
