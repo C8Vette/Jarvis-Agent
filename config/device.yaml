@@ -51,8 +51,8 @@ tts:
     rate: 185
   elevenlabs:
     api_key_env: ELEVENLABS_API_KEY
-    active_voice: ''
-    voice_id: eVItLK1UvXctxuaRV2Oq
+    active_voice: Patrick
+    voice_id: 9Ft9sm9dzvprPILZmLJl
     profiles:
       Edward:
         voice_id: goT3UYdM9bhm0n2lmKQx
