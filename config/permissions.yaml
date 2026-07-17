@@ -3,6 +3,28 @@ auto_allow:
   - open_website
   - search_files
   - open_folder
+  - open_file
+  - daily_brief
+  - add_task
+  - list_tasks
+  - complete_task
+  - add_reminder
+  - list_reminders
+  - complete_reminder
+  - gmail_digest
+  - gmail_status
+  - add_project
+  - list_projects
+  - set_project_status
+  - set_project_next_action
+  - set_tts_provider
+  - set_tts_enabled
+  - tts_status
+  - set_elevenlabs_voice
+  - set_assistant_mode
+  - assistant_mode_status
+  - search_web
+  - search_youtube
 
 require_confirmation:
   - run_terminal
@@ -12,3 +34,6 @@ require_confirmation:
   - send_email
   - install_package
   - change_system_settings
+  - gmail_connect
+
+blocked: []

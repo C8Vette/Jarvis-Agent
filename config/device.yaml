@@ -1,23 +1,119 @@
-device_name: "Ethan Desktop"
-
+device_name: Ethan Desktop
 allowed_folders:
-  - "C:/Users/tsmgr/Desktop"
-  - "C:/Users/tsmgr/Documents"
-  - "C:/Users/tsmgr/Downloads"
-
+- C:/Users/tsmgr/Desktop
+- C:/Users/tsmgr/Documents
+- C:/Users/tsmgr/Downloads
 apps:
-  chrome: "C:/Program Files/Google/Chrome/Application/chrome.exe"
-  edge: "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
-  opera: "C:/Users/tsmgr/AppData/Local/Programs/Opera/opera.exe"
-  vscode: "code"
-  powershell: "powershell"
-
+  chrome: C:/Program Files/Google/Chrome/Application/chrome.exe
+  edge: C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe
+  opera: C:/Users/tsmgr/AppData/Local/Programs/Opera/opera.exe
+  vscode: code
+  powershell: powershell
 websites:
-  email: "https://mail.google.com"
-  gmail: "https://mail.google.com"
-  outlook: "https://outlook.office.com"
-  github: "https://github.com"
-  aws: "https://console.aws.amazon.com"
-  indeed: "https://www.indeed.com"
-  linkedin: "https://www.linkedin.com/jobs"
-  handshake: "https://joinhandshake.com"
+  email: https://mail.google.com
+  gmail: https://mail.google.com
+  outlook: https://outlook.office.com
+  claude: https://claude.ai
+  codex: https://chatgpt.com/codex
+  youtube: https://www.youtube.com
+  google: https://www.google.com
+  github: https://github.com
+  aws: https://console.aws.amazon.com
+  indeed: https://www.indeed.com
+  linkedin: https://www.linkedin.com/jobs
+  handshake: https://joinhandshake.com
+voice:
+  wake_word: hey jarvis
+  wake_threshold: 0.8
+  wake_inference_framework: onnx
+  vad_threshold: 0.3
+  command_seconds: 45.0
+  start_timeout_seconds: 8.0
+  silence_seconds: 3.0
+  min_command_seconds: 2.0
+  pre_roll_seconds: 0.7
+  speech_rms_threshold: 0
+  speech_rms_multiplier: 2.4
+  min_speech_rms_threshold: 120
+  prompt_after_wake: false
+  wake_response: Yes?
+  listen_delay_seconds: 0.0
+  audible_cues: true
+  listen_cue_hz: 880
+  done_cue_hz: 660
+  cue_ms: 110
+  cooldown_seconds: 1.0
+tts:
+  enabled: true
+  provider: elevenlabs
+  fallback_provider: local
+  local:
+    rate: 185
+  elevenlabs:
+    api_key_env: ELEVENLABS_API_KEY
+    active_voice: ''
+    voice_id: eVItLK1UvXctxuaRV2Oq
+    profiles:
+      Edward:
+        voice_id: goT3UYdM9bhm0n2lmKQx
+        description: Deep low British Male
+      Jean:
+        voice_id: eVItLK1UvXctxuaRV2Oq
+        description: Flirty American Female
+      Patrick:
+        voice_id: 9Ft9sm9dzvprPILZmLJl
+        description: Australian Male
+    model_id: eleven_multilingual_v2
+    output_format: pcm_16000
+    stability: 0.45
+    similarity_boost: 0.75
+assistant_modes:
+  active: conversation
+  modes:
+    command:
+      enabled: true
+      use_llm_router: true
+      speak_responses: true
+      continuous_session: false
+      wake_word_required: true
+      session_idle_timeout_seconds: 18.0
+      session_max_turns: 1
+    conversation:
+      enabled: true
+      use_llm_router: true
+      speak_responses: true
+      continuous_session: true
+      wake_word_required: true
+      session_idle_timeout_seconds: 22.0
+      session_max_turns: 8
+    push_to_talk:
+      enabled: true
+      use_llm_router: true
+      speak_responses: true
+      continuous_session: false
+      wake_word_required: false
+      session_idle_timeout_seconds: 30.0
+      session_max_turns: 1
+    assist:
+      enabled: true
+      use_llm_router: false
+      speak_responses: true
+      continuous_session: false
+      wake_word_required: true
+      session_idle_timeout_seconds: 18.0
+      session_max_turns: 1
+  realtime:
+    enabled: false
+    provider: openai
+    model: gpt-4o-realtime-preview
+    session_timeout_seconds: 600
+    idle_timeout_seconds: 45
+    requires_backend_proxy: true
+integrations:
+  gmail:
+    enabled: false
+    credentials_path: data/google/credentials.json
+    token_path: data/google/token.json
+    max_messages: 8
+    query: newer_than:7d -category:promotions
+    important_query: is:unread newer_than:7d

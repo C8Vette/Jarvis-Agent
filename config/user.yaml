@@ -1,0 +1,26 @@
+profile:
+  name: "Ethan"
+
+routine:
+  morning_checklist:
+    - "Check Moodle"
+    - "Check Gmail"
+    - "Review today's task list"
+  daily_focus:
+    - "Check Moodle for current assignments"
+    - "Review important email"
+    - "Pick one school task and one project task before opening distractions"
+
+school:
+  lms: "Moodle"
+  moodle_url: ""
+  sources:
+    - "Moodle"
+    - "Gmail"
+  courses: []
+
+projects:
+  - name: "Jarvis agent"
+    status: "active"
+    priority: "high"
+    workflow: "Capture requests, route safely, then add automations only after they are permissioned."

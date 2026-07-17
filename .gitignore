@@ -16,6 +16,7 @@ build/
 
 # Virtual environment
 .venv/
+.venv-broken-store-python/
 venv/
 env/
 

@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Voice Agent Console</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script>
+      window.JARVIS_CONTROL_TOKEN = "__JARVIS_CONTROL_TOKEN__";
+    </script>
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>Voice Agent Console</h1>
+        <p id="deviceName">Loading</p>
+      </div>
+      <div class="status">
+        <span id="saveState">Ready</span>
+        <button id="refreshButton" type="button">Refresh</button>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="Control center sections">
+      <button class="tab active" type="button" data-tab="live">Live</button>
+      <button class="tab" type="button" data-tab="dashboard">Dashboard</button>
+      <button class="tab" type="button" data-tab="modes">Modes</button>
+      <button class="tab" type="button" data-tab="voice">Voice</button>
+      <button class="tab" type="button" data-tab="targets">Targets</button>
+      <button class="tab" type="button" data-tab="safety">Safety</button>
+    </nav>
+
+    <main>
+      <section id="live" class="tab-panel active">
+        <div class="live-shell">
+          <section class="presence-stage" aria-label="Assistant status">
+            <div class="startup-rail" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="presence-core" aria-hidden="true">
+              <div class="voice-ring outer"></div>
+              <div class="voice-ring middle"></div>
+              <div class="voice-ring inner"></div>
+              <div class="voice-bars">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div class="presence-copy">
+              <span id="liveStateLabel">Online</span>
+              <h2 id="liveModeTitle">Conversation Mode</h2>
+              <p id="liveFocusText">Loading focus</p>
+            </div>
+          </section>
+
+          <section class="live-command">
+            <div class="live-strip">
+              <div>
+                <span>Mode</span>
+                <strong id="liveModeMetric">Conversation</strong>
+              </div>
+              <div>
+                <span>Voice</span>
+                <strong id="liveVoiceMetric">Windows</strong>
+              </div>
+              <div>
+                <span>Tasks</span>
+                <strong id="liveTaskMetric">0</strong>
+              </div>
+              <div>
+                <span>Due</span>
+                <strong id="liveDueMetric">0</strong>
+              </div>
+            </div>
+
+            <div class="live-actions">
+              <button id="liveRefresh" type="button">Refresh</button>
+              <button id="liveConversation" class="secondary" type="button">Conversation</button>
+              <button id="liveCommand" class="secondary" type="button">Command</button>
+              <button id="liveAssist" class="secondary" type="button">Assist</button>
+            </div>
+
+            <div class="signal-grid" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </section>
+        </div>
+
+        <div class="live-lower">
+          <section>
+            <h3>Activity</h3>
+            <div id="liveActivityList" class="live-timeline"></div>
+          </section>
+          <section>
+            <h3>Today</h3>
+            <div id="liveTodayList" class="live-today"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="dashboard" class="tab-panel">
+        <div class="section-head">
+          <h2>Today</h2>
+          <button id="refreshDashboard" type="button">Refresh Dashboard</button>
+        </div>
+        <div class="dashboard-grid">
+          <div class="metric">
+            <span>Open Tasks</span>
+            <strong id="metricTasks">0</strong>
+          </div>
+          <div class="metric">
+            <span>Due Today</span>
+            <strong id="metricDueToday">0</strong>
+          </div>
+          <div class="metric">
+            <span>Projects</span>
+            <strong id="metricProjects">0</strong>
+          </div>
+          <div class="metric">
+            <span>Reminders</span>
+            <strong id="metricReminders">0</strong>
+          </div>
+          <div class="metric">
+            <span>Gmail</span>
+            <strong id="metricGmail">0</strong>
+          </div>
+        </div>
+        <div class="focus-band">
+          <span>Recommended Focus</span>
+          <strong id="recommendedFocus">Loading</strong>
+        </div>
+        <div class="dashboard-columns">
+          <section>
+            <h3>Due Today</h3>
+            <div id="dueTodayList" class="list-panel"></div>
+          </section>
+          <section>
+            <h3>Upcoming</h3>
+            <div id="upcomingList" class="list-panel"></div>
+          </section>
+          <section>
+            <h3>Active Projects</h3>
+            <div id="projectList" class="list-panel"></div>
+          </section>
+          <section>
+            <h3>School Sources</h3>
+            <div id="schoolList" class="list-panel"></div>
+          </section>
+          <section>
+            <h3>Reminders</h3>
+            <div id="reminderList" class="list-panel"></div>
+          </section>
+          <section>
+            <h3>Important Email</h3>
+            <div id="gmailList" class="list-panel"></div>
+          </section>
+          <section>
+            <h3>Daily Brief</h3>
+            <div id="briefText" class="brief-panel"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="modes" class="tab-panel">
+        <div class="section-head">
+          <h2>Assistant Modes</h2>
+          <button id="saveModes" type="button">Save Modes</button>
+        </div>
+        <div class="mode-summary">
+          <label>
+            Active Mode
+            <select id="activeMode"></select>
+          </label>
+          <div>
+            <strong id="activeModeTitle">Command</strong>
+            <span id="activeModeDescription">Wake word, one command, one response.</span>
+          </div>
+        </div>
+        <div id="modeList" class="mode-list"></div>
+        <div class="section-head inner">
+          <h2>Future Realtime Proxy</h2>
+        </div>
+        <div class="settings-grid">
+          <label class="check-row">
+            <input id="realtimeEnabled" type="checkbox">
+            Realtime Enabled
+          </label>
+          <label>
+            Provider
+            <input id="realtimeProvider" type="text" autocomplete="off">
+          </label>
+          <label>
+            Model
+            <input id="realtimeModel" type="text" autocomplete="off">
+          </label>
+          <label>
+            Session Timeout
+            <input id="realtimeSessionTimeout" type="number" min="30" max="7200" step="30">
+          </label>
+          <label>
+            Idle Timeout
+            <input id="realtimeIdleTimeout" type="number" min="5" max="600" step="5">
+          </label>
+          <label class="check-row">
+            <input id="realtimeProxyRequired" type="checkbox">
+            Requires Backend Proxy
+          </label>
+        </div>
+      </section>
+
+      <section id="voice" class="tab-panel">
+        <div class="section-head">
+          <h2>Voice</h2>
+          <button id="saveVoice" type="button">Save Voice</button>
+        </div>
+        <div class="settings-grid">
+          <label>
+            Wake Word
+            <input id="wakeWord" type="text" autocomplete="off">
+          </label>
+          <label>
+            Wake Threshold
+            <input id="wakeThreshold" type="range" min="0.1" max="1" step="0.01">
+            <output id="wakeThresholdValue"></output>
+          </label>
+          <label>
+            Silence Seconds
+            <input id="silenceSeconds" type="number" min="0.5" max="10" step="0.1">
+          </label>
+          <label>
+            Start Timeout
+            <input id="startTimeout" type="number" min="1" max="30" step="0.5">
+          </label>
+          <label>
+            Command Window
+            <input id="commandSeconds" type="number" min="5" max="180" step="1">
+          </label>
+          <label>
+            Pre-Roll
+            <input id="preRoll" type="number" min="0" max="3" step="0.1">
+          </label>
+          <label>
+            Min Speech RMS
+            <input id="minSpeechRms" type="number" min="0" max="2000" step="10">
+          </label>
+          <label class="check-row">
+            <input id="audibleCues" type="checkbox">
+            Audible Cues
+          </label>
+        </div>
+
+        <div class="section-head inner">
+          <h2>TTS</h2>
+          <button id="saveTts" type="button">Save TTS</button>
+        </div>
+        <div class="settings-grid">
+          <label class="check-row">
+            <input id="ttsEnabled" type="checkbox">
+            Spoken Responses
+          </label>
+          <label>
+            Provider
+            <select id="ttsProvider">
+              <option value="windows">Windows</option>
+              <option value="elevenlabs">ElevenLabs</option>
+              <option value="local">Local pyttsx3</option>
+              <option value="none">None</option>
+            </select>
+          </label>
+          <label>
+            Fallback
+            <select id="ttsFallback">
+              <option value="windows">Windows</option>
+              <option value="local">Local pyttsx3</option>
+              <option value="none">None</option>
+            </select>
+          </label>
+          <label>
+            Local Rate
+            <input id="localRate" type="number" min="80" max="320" step="5">
+          </label>
+          <label>
+            ElevenLabs Voice ID
+            <input id="elevenVoiceId" type="text" autocomplete="off">
+          </label>
+          <label>
+            Active Voice Profile
+            <select id="elevenActiveVoice"></select>
+          </label>
+          <label>
+            ElevenLabs Model
+            <input id="elevenModel" type="text" autocomplete="off">
+          </label>
+          <label>
+            Stability
+            <input id="elevenStability" type="range" min="0" max="1" step="0.01">
+            <output id="elevenStabilityValue"></output>
+          </label>
+          <label>
+            Similarity
+            <input id="elevenSimilarity" type="range" min="0" max="1" step="0.01">
+            <output id="elevenSimilarityValue"></output>
+          </label>
+        </div>
+        <div class="section-head inner">
+          <h2>ElevenLabs Voice Profiles</h2>
+          <button id="saveVoices" type="button">Save Profiles</button>
+        </div>
+        <div id="voiceProfilesList" class="rows voice-profiles"></div>
+        <button id="addVoiceProfile" class="secondary" type="button">Add Voice Profile</button>
+      </section>
+
+      <section id="targets" class="tab-panel">
+        <div class="section-head">
+          <h2>Targets</h2>
+          <button id="saveTargets" type="button">Save Targets</button>
+        </div>
+        <div class="split">
+          <div>
+            <h3>Apps</h3>
+            <div id="appsList" class="rows"></div>
+            <button id="addApp" class="secondary" type="button">Add App</button>
+          </div>
+          <div>
+            <h3>Sites</h3>
+            <div id="sitesList" class="rows"></div>
+            <button id="addSite" class="secondary" type="button">Add Site</button>
+          </div>
+        </div>
+        <div class="section-head inner">
+          <h2>Allowed Folders</h2>
+        </div>
+        <div id="foldersList" class="rows wide"></div>
+        <button id="addFolder" class="secondary" type="button">Add Folder</button>
+      </section>
+
+      <section id="safety" class="tab-panel">
+        <div class="section-head">
+          <h2>Safety</h2>
+          <button id="saveSafety" type="button">Save Safety</button>
+        </div>
+        <div id="actionsList" class="policy-table"></div>
+      </section>
+    </main>
+  </body>
+</html>

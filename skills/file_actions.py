@@ -1,23 +1,8 @@
 import os
 from pathlib import Path
-from core.config import load_device_config
 
-
-def get_allowed_roots() -> list[Path]:
-    config = load_device_config()
-    return [Path(folder) for folder in config.get("allowed_folders", [])]
-
-
-def is_allowed_path(path: Path) -> bool:
-    try:
-        resolved_path = path.resolve()
-        for root in get_allowed_roots():
-            if root.exists() and resolved_path.is_relative_to(root.resolve()):
-                return True
-    except Exception:
-        return False
-
-    return False
+# The filesystem sandbox now lives in core.safety (single source of truth).
+from core.safety import get_allowed_roots, is_allowed_path
 
 
 def find_matching_files(query: str, max_results: int = 20) -> list[Path]:
@@ -41,18 +26,13 @@ def find_matching_files(query: str, max_results: int = 20) -> list[Path]:
 
 
 def open_folder(folder_name: str) -> str:
-    config = load_device_config()
-
     common_folders = {
         "desktop": Path.home() / "Desktop",
         "documents": Path.home() / "Documents",
         "downloads": Path.home() / "Downloads",
     }
 
-    folder = common_folders.get(folder_name.lower())
-
-    if folder is None:
-        folder = Path(folder_name)
+    folder = common_folders.get(folder_name.lower(), Path(folder_name))
 
     if not folder.exists():
         return f"I could not find this folder: {folder}"
@@ -67,7 +47,7 @@ def open_best_file_match(query: str) -> str:
     if not matches:
         return f"I could not find a file matching: {query}"
 
-    # Prefer newest modified file
+    # Prefer the newest modified file.
     best_match = max(matches, key=lambda p: p.stat().st_mtime)
 
     if not is_allowed_path(best_match):
