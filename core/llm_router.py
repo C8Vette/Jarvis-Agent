@@ -6,7 +6,15 @@ from core.config import load_device_config
 
 load_dotenv(override=True)
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+def _client() -> OpenAI:
+    load_dotenv(override=True)
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "OPENAI_API_KEY is not set. Create .env from .env.example, "
+            "or use assist mode for local-only commands."
+        )
+    return OpenAI(api_key=api_key)
 
 SYSTEM_PROMPT = """
 You are Jarvis, a local Windows desktop assistant.
@@ -99,7 +107,7 @@ Allowed folders: {folders}
 def llm_route(command: str) -> dict:
     context = get_available_context()
 
-    response = client.chat.completions.create(
+    response = _client().chat.completions.create(
         model=os.getenv("JARVIS_MODEL", "gpt-4.1-mini"),
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},

@@ -1,4 +1,4 @@
-$root = "C:\Users\tsmgr\Documents\jarvis-agent"
+$root = Split-Path -Parent $PSScriptRoot
 $desktop = [Environment]::GetFolderPath("Desktop")
 $shell = New-Object -ComObject WScript.Shell
 
