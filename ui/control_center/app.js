@@ -85,6 +85,7 @@ const render = () => {
   renderVoiceProfiles(eleven.profiles || {}, eleven.active_voice || "");
   renderModes(device.assistant_modes || {});
   renderDashboard(state.dashboard || {});
+  renderSystemStatus(state.system || {});
   renderLive(device, state.dashboard || {}, state.activity || []);
   renderActions();
   bindRange("wakeThreshold", "wakeThresholdValue");
@@ -154,6 +155,112 @@ const renderLiveActivity = (activity) => {
     body.append(title, meta);
     rowElement.append(dot, body);
     container.append(rowElement);
+  });
+};
+
+const renderSystemStatus = (system) => {
+  const python = system.python || {};
+  const env = system.env || {};
+  const tts = system.tts || {};
+  const git = system.git || {};
+  const processes = system.processes || {};
+
+  renderStatusRows("runtimeStatusList", [
+    statusRow("Root", system.root || "unknown", Boolean(system.root)),
+    statusRow("Python", [python.version, python.executable].filter(Boolean).join(" | "), Boolean(python.version)),
+    statusRow("OpenAI package", python.openai_package ? "installed" : "missing", Boolean(python.openai_package)),
+    statusRow("Voice packages", packageSummary(python), Boolean(python.sounddevice_package && python.openwakeword_package)),
+  ]);
+
+  const keys = env.keys || {};
+  renderStatusRows("envStatusList", [
+    statusRow(".env", env.exists ? env.path : "missing", Boolean(env.exists)),
+    statusRow("OPENAI_API_KEY", keys.OPENAI_API_KEY ? "present" : "missing", Boolean(keys.OPENAI_API_KEY)),
+    statusRow("JARVIS_MODEL", keys.JARVIS_MODEL ? "present" : "using default", true, keys.JARVIS_MODEL ? "ok" : "warn"),
+    statusRow("ELEVENLABS_API_KEY", keys.ELEVENLABS_API_KEY ? "present" : "missing", Boolean(keys.ELEVENLABS_API_KEY)),
+    statusRow("ELEVENLABS_VOICE_ID", keys.ELEVENLABS_VOICE_ID ? "present" : "using config/profile", true, keys.ELEVENLABS_VOICE_ID ? "ok" : "warn"),
+  ]);
+
+  renderStatusRows("ttsStatusList", [
+    statusRow("Enabled", tts.enabled === false ? "no" : "yes", tts.enabled !== false),
+    statusRow("Provider", `${tts.provider || "unknown"} -> ${tts.fallback_provider || "none"}`, Boolean(tts.provider)),
+    statusRow("Active voice", tts.active_voice || "manual/default", true, tts.active_voice ? "ok" : "warn"),
+    statusRow("Voice ID", tts.voice_id_configured ? "configured" : "missing", Boolean(tts.voice_id_configured)),
+    statusRow("Resolved status", tts.status || tts.error || "unknown", !tts.error, tts.error ? "bad" : "ok"),
+  ]);
+
+  renderStatusRows("gitStatusList", [
+    statusRow("Git", git.available ? "available" : (git.error || "missing"), Boolean(git.available)),
+    statusRow("Branch", git.status?.output || "unknown", Boolean(git.status?.ok), git.status?.output?.includes("ahead") ? "warn" : undefined),
+    statusRow("HEAD", git.head?.output || "unknown", Boolean(git.head?.ok)),
+  ]);
+
+  renderProcesses(processes.items || [], processes.error || "");
+  renderLogs(system.logs || []);
+};
+
+const packageSummary = (python) => {
+  const packages = [
+    ["sounddevice", python.sounddevice_package],
+    ["openWakeWord", python.openwakeword_package],
+    ["pyttsx3", python.pyttsx3_package],
+  ];
+  return packages.map(([name, ok]) => `${name}: ${ok ? "yes" : "no"}`).join(" | ");
+};
+
+const statusRow = (label, value, ok, severity) => ({
+  label,
+  value: value || "unknown",
+  severity: severity || (ok ? "ok" : "bad"),
+});
+
+const renderStatusRows = (containerId, rows) => {
+  const container = $(containerId);
+  container.replaceChildren();
+  rows.forEach((item) => {
+    const rowElement = document.createElement("div");
+    rowElement.className = "status-row";
+    const label = document.createElement("span");
+    label.textContent = item.label;
+    const value = document.createElement("strong");
+    value.textContent = item.value;
+    const pill = document.createElement("i");
+    pill.className = `status-pill ${item.severity}`;
+    pill.textContent = item.severity === "ok" ? "OK" : item.severity === "warn" ? "Check" : "Fix";
+    rowElement.append(label, value, pill);
+    container.append(rowElement);
+  });
+};
+
+const renderProcesses = (items, error) => {
+  if (error) {
+    renderList("processStatusList", [listItem("Process check failed", error)]);
+    return;
+  }
+  renderList("processStatusList", items.length ? items.map((item) => (
+    listItem(`PID ${item.pid}`, item.command || "python.exe")
+  )) : [listItem("No Jarvis Python processes", "Start Jarvis from the Desktop shortcut")]);
+};
+
+const renderLogs = (logs) => {
+  const container = $("logStatusList");
+  container.replaceChildren();
+  if (!logs.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = "No logs found.";
+    container.append(empty);
+    return;
+  }
+  logs.forEach((log) => {
+    const entry = document.createElement("div");
+    entry.className = "log-entry";
+    const title = document.createElement("strong");
+    title.textContent = `${log.name} (${log.size} bytes)`;
+    const body = document.createElement("pre");
+    body.textContent = (log.tail || []).join("\n") || "No recent lines.";
+    entry.append(title, body);
+    container.append(entry);
   });
 };
 
@@ -573,6 +680,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   $("refreshButton").addEventListener("click", () => loadState().catch((error) => setStatus(error.message, true)));
   $("refreshDashboard").addEventListener("click", () => loadState().catch((error) => setStatus(error.message, true)));
+  $("refreshStatus").addEventListener("click", () => loadState().catch((error) => setStatus(error.message, true)));
   $("liveRefresh").addEventListener("click", () => loadState().catch((error) => setStatus(error.message, true)));
   $("liveConversation").addEventListener("click", () => setActiveMode("conversation").catch((error) => setStatus(error.message, true)));
   $("liveCommand").addEventListener("click", () => setActiveMode("command").catch((error) => setStatus(error.message, true)));

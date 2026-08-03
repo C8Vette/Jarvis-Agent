@@ -136,7 +136,30 @@ ACTION_REGISTRY: dict[str, ActionDefinition] = {
         default_policy=AUTO_ALLOW,
         risk="read_only",
     ),
-    "open_app": ActionDefinition(
+    "create_operator_job": ActionDefinition(
+        name="create_operator_job",
+        description="Queue a supervised local operator job without executing external tools.",
+        default_policy=AUTO_ALLOW,
+        risk="local_memory_write",
+    ),
+    "list_operator_jobs": ActionDefinition(
+        name="list_operator_jobs",
+        description="List supervised local operator jobs.",
+        default_policy=AUTO_ALLOW,
+        risk="read_only",
+    ),
+    "operator_status": ActionDefinition(
+        name="operator_status",
+        description="Read status for a supervised operator job.",
+        default_policy=AUTO_ALLOW,
+        risk="read_only",
+    ),
+    "cancel_operator_job": ActionDefinition(
+        name="cancel_operator_job",
+        description="Cancel a supervised local operator job.",
+        default_policy=AUTO_ALLOW,
+        risk="local_memory_write",
+    ),    "open_app": ActionDefinition(
         name="open_app",
         description="Launch a configured local application.",
         default_policy=AUTO_ALLOW,

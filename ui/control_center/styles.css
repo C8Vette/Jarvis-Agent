@@ -675,6 +675,116 @@ button.remove:hover {
   grid-template-columns: minmax(120px, 180px) minmax(180px, 1fr) minmax(160px, 1fr) 38px;
 }
 
+.status-grid-main {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 16px;
+  padding-top: 18px;
+}
+
+.status-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 14px;
+}
+
+.status-list {
+  display: grid;
+  gap: 8px;
+}
+
+.status-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 160px) minmax(0, 1fr) 66px;
+  gap: 10px;
+  align-items: center;
+  min-height: 42px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.status-row:first-child {
+  border-top: 0;
+}
+
+.status-row span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-row strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-pill {
+  display: inline-grid;
+  place-items: center;
+  min-height: 26px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.status-pill.ok {
+  background: #e2f4ed;
+  color: var(--accent-strong);
+}
+
+.status-pill.warn {
+  background: #fff1d8;
+  color: #8a5513;
+}
+
+.status-pill.bad {
+  background: #f8e1e1;
+  color: var(--danger);
+}
+
+.status-columns {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
+  gap: 22px;
+  margin-top: 24px;
+}
+
+.logs-panel {
+  max-height: 440px;
+  overflow: auto;
+}
+
+.log-entry {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.log-entry:last-child {
+  border-bottom: 0;
+}
+
+.log-entry pre {
+  max-height: 180px;
+  margin: 0;
+  overflow: auto;
+  border-radius: 6px;
+  background: var(--console);
+  color: var(--console-text);
+  padding: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .policy-table {
   display: grid;
   gap: 1px;
@@ -743,6 +853,7 @@ button.remove:hover {
   .row,
   .wide .row,
   .voice-profiles .row,
+  .status-row,
   .policy-row {
     grid-template-columns: 1fr;
   }

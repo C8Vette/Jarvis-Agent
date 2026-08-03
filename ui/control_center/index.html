@@ -24,6 +24,7 @@
 
     <nav class="tabs" aria-label="Control center sections">
       <button class="tab active" type="button" data-tab="live">Live</button>
+      <button class="tab" type="button" data-tab="status">Status</button>
       <button class="tab" type="button" data-tab="dashboard">Dashboard</button>
       <button class="tab" type="button" data-tab="modes">Modes</button>
       <button class="tab" type="button" data-tab="voice">Voice</button>
@@ -106,6 +107,41 @@
         </div>
       </section>
 
+
+      <section id="status" class="tab-panel">
+        <div class="section-head">
+          <h2>System Status</h2>
+          <button id="refreshStatus" type="button">Refresh Status</button>
+        </div>
+        <div class="status-grid-main">
+          <section class="status-panel">
+            <h3>Runtime</h3>
+            <div id="runtimeStatusList" class="status-list"></div>
+          </section>
+          <section class="status-panel">
+            <h3>Environment</h3>
+            <div id="envStatusList" class="status-list"></div>
+          </section>
+          <section class="status-panel">
+            <h3>Voice</h3>
+            <div id="ttsStatusList" class="status-list"></div>
+          </section>
+          <section class="status-panel">
+            <h3>Git</h3>
+            <div id="gitStatusList" class="status-list"></div>
+          </section>
+        </div>
+        <div class="status-columns">
+          <section>
+            <h3>Processes</h3>
+            <div id="processStatusList" class="list-panel"></div>
+          </section>
+          <section>
+            <h3>Logs</h3>
+            <div id="logStatusList" class="list-panel logs-panel"></div>
+          </section>
+        </div>
+      </section>
       <section id="dashboard" class="tab-panel">
         <div class="section-head">
           <h2>Today</h2>

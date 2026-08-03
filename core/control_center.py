@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import mimetypes
+import os
 import secrets
+import shutil
+import subprocess
+import sys
 import traceback
 from dataclasses import asdict
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
+
+from dotenv import dotenv_values
 
 from rich.console import Console
 
@@ -73,6 +80,9 @@ def _handler(token: str):
                 return
             if parsed.path == "/api/dashboard":
                 self._send_json(dashboard_state())
+                return
+            if parsed.path == "/api/system":
+                self._send_json(_system_status())
                 return
             if parsed.path == "/api/token":
                 self._send_json({"token": token})
@@ -169,6 +179,7 @@ def _state() -> dict:
         "device": load_device_config(),
         "permissions": load_permissions(),
         "dashboard": dashboard_state(),
+        "system": _system_status(),
         "activity": _recent_activity(),
         "actions": {
             name: asdict(definition)
@@ -177,6 +188,165 @@ def _state() -> dict:
         "mode_options": mode_options(),
     }
 
+def _system_status() -> dict:
+    return {
+        "root": str(ROOT),
+        "python": _python_status(),
+        "env": _env_status(),
+        "tts": _tts_status(),
+        "processes": _process_status(),
+        "git": _git_status(),
+        "logs": _log_status(),
+    }
+
+
+def _python_status() -> dict:
+    return {
+        "executable": sys.executable,
+        "version": sys.version.split()[0],
+        "openai_package": importlib.util.find_spec("openai") is not None,
+        "sounddevice_package": importlib.util.find_spec("sounddevice") is not None,
+        "openwakeword_package": importlib.util.find_spec("openwakeword") is not None,
+        "pyttsx3_package": importlib.util.find_spec("pyttsx3") is not None,
+    }
+
+
+def _env_status() -> dict:
+    env_path = ROOT / ".env"
+    values = dotenv_values(env_path) if env_path.exists() else {}
+    keys = [
+        "OPENAI_API_KEY",
+        "JARVIS_MODEL",
+        "JARVIS_CHAT_MODEL",
+        "ELEVENLABS_API_KEY",
+        "ELEVENLABS_VOICE_ID",
+        "ELEVENLABS_ACTIVE_VOICE",
+    ]
+    return {
+        "path": str(env_path),
+        "exists": env_path.exists(),
+        "keys": {
+            key: bool(os.getenv(key) or values.get(key))
+            for key in keys
+        },
+    }
+
+
+def _tts_status() -> dict:
+    try:
+        from core.speech import Speaker, TTSSettings
+
+        settings = TTSSettings.from_config()
+        speaker = Speaker(settings)
+        return {
+            "enabled": settings.enabled,
+            "provider": settings.provider,
+            "fallback_provider": settings.fallback_provider,
+            "active_voice": settings.elevenlabs_active_voice,
+            "voice_id_configured": bool(settings.elevenlabs_voice_id),
+            "status": speaker.provider_status,
+        }
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+def _process_status() -> dict:
+    script = (
+        "Get-CimInstance Win32_Process -Filter \"name = 'python.exe'\" | "
+        "Where-Object { $_.CommandLine -like '*jarvis-agent*' } | "
+        "Select-Object ProcessId,CommandLine | ConvertTo-Json -Compress"
+    )
+    try:
+        result = subprocess.run(
+            ["powershell", "-NoProfile", "-Command", script],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except Exception as exc:
+        return {"available": False, "error": str(exc), "items": []}
+
+    if result.returncode != 0:
+        return {
+            "available": False,
+            "error": (result.stderr or result.stdout).strip(),
+            "items": [],
+        }
+
+    raw = result.stdout.strip()
+    if not raw:
+        return {"available": True, "items": []}
+
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        return {"available": False, "error": raw, "items": []}
+
+    items = parsed if isinstance(parsed, list) else [parsed]
+    return {
+        "available": True,
+        "items": [
+            {
+                "pid": item.get("ProcessId"),
+                "command": str(item.get("CommandLine", "")),
+            }
+            for item in items
+            if isinstance(item, dict)
+        ],
+    }
+
+
+def _git_status() -> dict:
+    git = shutil.which("git")
+    if not git:
+        portable = Path.home() / "PortableGit" / "cmd" / "git.exe"
+        if portable.exists():
+            git = str(portable)
+    if not git:
+        return {"available": False, "error": "git.exe not found"}
+
+    def run_git(*args: str) -> dict:
+        try:
+            result = subprocess.run(
+                [git, "-C", str(ROOT), *args],
+                capture_output=True,
+                text=True,
+                timeout=8,
+            )
+        except Exception as exc:
+            return {"ok": False, "output": str(exc)}
+        output = (result.stdout or result.stderr).strip()
+        return {"ok": result.returncode == 0, "output": output}
+
+    return {
+        "available": True,
+        "status": run_git("status", "-sb"),
+        "head": run_git("log", "-1", "--oneline"),
+        "remote": run_git("remote", "-v"),
+    }
+
+
+def _log_status(limit: int = 8) -> list[dict]:
+    log_dir = ROOT / "data" / "logs"
+    if not log_dir.exists():
+        return []
+
+    logs = []
+    for path in sorted(log_dir.glob("*.log")):
+        try:
+            lines = path.read_text(encoding="utf-8", errors="replace").splitlines()[-limit:]
+            stat = path.stat()
+        except OSError:
+            continue
+        logs.append(
+            {
+                "name": path.name,
+                "size": stat.st_size,
+                "modified": int(stat.st_mtime),
+                "tail": lines,
+            }
+        )
+    return logs
 
 def _recent_activity(limit: int = 12) -> list[dict]:
     audit_path = ROOT / "data" / "audit.log"

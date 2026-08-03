@@ -12,6 +12,8 @@ Local Windows assistant for opening apps/sites, searching allowed folders, and b
 - Action registry in `core/actions.py`
 - Safety policy in `config/permissions.yaml`
 - Local audit log at `data/audit.log`
+- System Status page for migration/runtime health checks
+- Supervised operator job queue foundation for future autonomous work sessions
 - Device-specific apps, websites, and allowed folders in `config/device.yaml`
 - Browser URLs open with the Windows default browser
 - Personal routine and school/project context in `config/user.yaml`
@@ -130,7 +132,9 @@ Then open:
 http://127.0.0.1:8765
 ```
 
-The Control Center edits `config/device.yaml` and `config/permissions.yaml`. It currently covers the daily operating dashboard, voice tuning, TTS provider settings, ElevenLabs voice profiles, configured apps/sites/folders, and action policies.
+The Control Center edits `config/device.yaml` and `config/permissions.yaml`. It currently covers the daily operating dashboard, system status, voice tuning, TTS provider settings, ElevenLabs voice profiles, configured apps/sites/folders, and action policies.
+
+The Status tab shows sanitized migration/runtime health: `.env` presence, whether expected keys are set, Python package availability, TTS provider resolution, running Jarvis processes, Git status, and recent logs. It never displays API key values.
 
 ## Assistant Modes
 
@@ -224,6 +228,19 @@ These commands update `config/device.yaml` so they are available to the current 
 
 ElevenLabs voice profiles live in `config/device.yaml` under `tts.elevenlabs.profiles`. Store only voice IDs there; keep the API key in `.env`.
 
+## Operator / Supervisor Foundation
+
+Jarvis has a Phase 1 supervised operator job queue. This is the first safe step toward autonomous project work. It only creates, lists, inspects, and cancels local job records; it does not yet control Claude, ChatGPT, Codex, browsers, or terminals.
+
+Useful commands:
+
+- `create operator job audit the Jarvis repo and propose next steps`
+- `start supervised task build the system status page`
+- `operator status`
+- `show operator jobs`
+- `cancel operator job 1`
+
+The architecture plan lives in `OPERATOR_SUPERVISOR_PLAN.md`.
 ## Action Safety
 
 Every action should be registered in `core/actions.py`, then enabled in `config/permissions.yaml` as one of:

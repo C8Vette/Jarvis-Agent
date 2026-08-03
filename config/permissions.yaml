@@ -25,6 +25,10 @@ auto_allow:
   - assistant_mode_status
   - search_web
   - search_youtube
+  - create_operator_job
+  - list_operator_jobs
+  - operator_status
+  - cancel_operator_job
 
 require_confirmation:
   - run_terminal

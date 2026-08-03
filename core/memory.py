@@ -11,6 +11,7 @@ from core.config import ROOT
 TASKS_PATH = ROOT / "data" / "tasks.yaml"
 PROJECTS_PATH = ROOT / "data" / "projects.yaml"
 REMINDERS_PATH = ROOT / "data" / "reminders.yaml"
+OPERATOR_JOBS_PATH = ROOT / "data" / "operator_jobs.yaml"
 
 
 def now_iso() -> str:
@@ -76,5 +77,23 @@ def next_reminder_id(reminders: list[dict[str, Any]]) -> int:
         int(reminder.get("id", 0))
         for reminder in reminders
         if str(reminder.get("id", "")).isdigit()
+    ]
+    return max(ids, default=0) + 1
+
+
+def load_operator_jobs() -> list[dict[str, Any]]:
+    data = load_yaml_file(OPERATOR_JOBS_PATH, {"operator_jobs": []})
+    return list(data.get("operator_jobs", []))
+
+
+def save_operator_jobs(jobs: list[dict[str, Any]]) -> None:
+    save_yaml_file(OPERATOR_JOBS_PATH, {"operator_jobs": jobs})
+
+
+def next_operator_job_id(jobs: list[dict[str, Any]]) -> int:
+    ids = [
+        int(job.get("id", 0))
+        for job in jobs
+        if str(job.get("id", "")).isdigit()
     ]
     return max(ids, default=0) + 1

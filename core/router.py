@@ -22,6 +22,7 @@ from skills.settings import (
 from skills.projects import add_project, list_projects, set_project_next_action, set_project_status
 from skills.reminders import add_reminder, complete_reminder, list_reminders
 from skills.gmail import gmail_connect, gmail_digest, gmail_status
+from skills.operator import cancel_operator_job, create_operator_job, list_operator_jobs, operator_status
 
 # Exact phrases that map straight to a known folder.
 _FOLDER_PHRASES = {
@@ -194,6 +195,10 @@ def _dispatch_action(action: str, target: str, command: str) -> str:
         "assistant_mode_status": assistant_mode_status,
         "search_web": search_web,
         "search_youtube": search_youtube,
+        "create_operator_job": create_operator_job,
+        "list_operator_jobs": list_operator_jobs,
+        "operator_status": operator_status,
+        "cancel_operator_job": cancel_operator_job,
     }
 
     handler = handlers.get(action)
@@ -335,6 +340,35 @@ def _local_route(text: str, command: str):
         target = f"{status_match.group(1)} to {status_match.group(2)}"
         return _dispatch_action("set_project_status", target, command)
 
+    if text in {
+        "operator status",
+        "supervisor status",
+        "operator jobs",
+        "show operator jobs",
+        "list operator jobs",
+        "supervised jobs",
+    }:
+        return _dispatch_action("list_operator_jobs", "", command)
+
+    for prefix in (
+        "create operator job ",
+        "queue operator job ",
+        "start operator job ",
+        "create supervised task ",
+        "start supervised task ",
+        "queue supervised task ",
+        "have jarvis work on ",
+    ):
+        if text.startswith(prefix):
+            return _dispatch_action("create_operator_job", _strip_prefix(command, prefix), command)
+
+    for prefix in ("cancel operator job ", "stop operator job ", "cancel supervised task "):
+        if text.startswith(prefix):
+            return _dispatch_action("cancel_operator_job", _strip_prefix(command, prefix), command)
+
+    for prefix in ("operator status ", "supervisor status ", "status for operator job "):
+        if text.startswith(prefix):
+            return _dispatch_action("operator_status", _strip_prefix(command, prefix), command)
     if text in {"tts status", "voice status", "what voice are you using", "what voice are you using?"}:
         return _dispatch_action("tts_status", "", command)
 

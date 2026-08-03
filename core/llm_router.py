@@ -48,6 +48,10 @@ Available actions:
 - set_elevenlabs_voice
 - set_assistant_mode
 - assistant_mode_status
+- create_operator_job
+- list_operator_jobs
+- operator_status
+- cancel_operator_job
 - unknown
 
 Rules:
@@ -79,6 +83,10 @@ Rules:
 - Choose set_elevenlabs_voice when the user asks to switch to a named configured ElevenLabs voice.
 - Choose set_assistant_mode when the user asks to switch to command, conversation, push-to-talk, or assist mode.
 - Choose assistant_mode_status when the user asks what Jarvis mode is active.
+- Choose create_operator_job when the user asks Jarvis to start, queue, supervise, or work on a larger project task.
+- Choose list_operator_jobs when the user asks what supervised jobs or operator tasks exist.
+- Choose operator_status when the user asks for the status of a supervised job.
+- Choose cancel_operator_job when the user asks to cancel or stop a supervised job.
 - If unsure, use unknown.
 
 JSON format:
